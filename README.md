@@ -6,6 +6,14 @@ Should animate smoothly in browser
 
 Should respond immediately to panning and zooming
 
+3. fractional zooms
+
+4. clear labels
+
+5. perceived performance
+
+6. html responsive
+
 3. hackability
 
 Should provide modularity via plain JavaScript
