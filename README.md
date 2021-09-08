@@ -1,31 +1,42 @@
-1. 60fps (smoothness)
+Criteria for basemap on rendering for the web. The more you can achieve, the better. in rough descending order
 
-Should animate smoothly in browser
+1. 60fps smoothness
 
-2. 0ms (responsiveness)
+The map should animate smoothly.
 
-Should respond immediately to panning and zooming
+2. 0ms responsiveness
 
-3. fractional zooms
+The map should respond immediately to panning and zooming.
 
-4. clear labels
+3. object persistence
 
-5. perceived performance
+The map should maintain the illusion of a seamless map, even if features and labels are being transitioned between zooms.
 
-6. html responsive
+4. clarity
 
-3. hackability
+The resolution of features and labels should match the capabilities of the device display.
 
-Should provide modularity via plain JavaScript
+5. responsive web design
 
-4. i18n
+The map should behave properly to changes in page size, aspect ratio, or device orientation. 
 
-Should support the full range of unicode writing systems out of the box
+6. fractional zooms
 
-5. a11y
+The map should support a continuum of zoom levels.
 
-Should work with screen readers
+7. hackability
 
-6. interactivity
+Most parts of the map system should be modifiable at runtime via JavaScript. 
 
-Should have hoverable + clickable labels
+8. i18n
+
+Should support the full range of unicode writing systems out of the box.
+
+9. interactivity
+
+The map should have hoverable + clickable labels.
+
+10. a11y
+
+The map labels should work with screen readers.
+
