@@ -3,9 +3,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
    crossorigin=""/>
-   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
    crossorigin=""></script>
+   <!-- <script src="Leaflet.SmoothwheelZoom.js"></script> -->
    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
@@ -17,10 +17,10 @@
             height: 100%;
         }
 
-/*        .leaflet-zoom-anim .leaflet-zoom-animated {
-            transition: transform 0.99s cubic-bezier(0,0,0.25,1);
+        .leaflet-zoom-anim .leaflet-zoom-animated {
+            transition: transform 0.25s cubic-bezier(0,0,0.25,1);
         }
-*/    </style>
+    </style>
 <body>
     <div id="map"></div>
     <script src="index.js"></script>
@@ -39,18 +39,7 @@
             }
         })
 
-
-        let project = (in_lat,in_lng) => {
-            var d = Math.PI / 180,
-                max = 85.0511287798,
-                lat = Math.max(Math.min(max, in_lat), -max),
-                sin = Math.sin(lat * d);
-
-            return [in_lng * d,Math.log((1 + sin) / (1 - sin)) / 2]
-        }
-
-
-        var map = L.map('map',{zoomSnap:true}).setView([0,0], 0)
+        var map = L.map('map',{zoomAnimation:true,zoomSnap:true}).setView([0,0], 0)
         window.map = map
         let pane = L.DomUtil.create('canvas', 'leaflet-base-container', map._container);
         (new CanvasLayer()).addTo(map)
@@ -66,25 +55,26 @@
         var startDrag = undefined;
 
         map.on("zoomanim", animEvent => {
-            var start = performance.now()
+            var start = undefined // performance.now()
             var startZoom = map.getZoom()
             var endZoom = animEvent.zoom
             let startLat = map.getCenter().lat
             let startLng = map.getCenter().lng
-            let startPos = project(startLat,startLng)
             let endLat = animEvent.center.lat
             let endLng = animEvent.center.lng
-            let endPos = project(endLat,endLng)
 
             let animDuration = 250
             let bez = new UnitBezier(0,0,0.25,1)
             let animate = ts => {
+                if (start === undefined) {
+                    start = ts
+                }
                 let elapsed = ts - start
                 if (elapsed < animDuration) {
                     let t = bez.solve(elapsed/animDuration)
                     w.zoom = startZoom + t*(endZoom-startZoom)
-                    w.tx = startPos[0] + t *(endPos[0]-startPos[0])
-                    w.ty = startPos[1] + t *(endPos[1]-startPos[1])
+                    w.lat = startLat + t *(endLat-startLat)
+                    w.lng = startLng + t *(endLng-startLng)
                     w.draw(stats.begin,stats.end)
                     requestAnimationFrame(animate)
                 }
@@ -95,9 +85,8 @@
 
         map.on("move", e => {
             let center = map.getCenter()
-            let pos = project(center.lat,center.lng)
-            w.tx = pos[0]
-            w.ty = pos[1]
+            w.lat = center.lat
+            w.lng = center.lng
             w.zoom = map.getZoom()
             w.draw(stats.begin,stats.end)
 
