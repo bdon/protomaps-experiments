@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <title>complex-filters</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script>
+
+        <!-- leaflet -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet.sync@0.2.4/L.Map.Sync.js"></script>
+        <script src="https://unpkg.com/leaflet-hash@0.2.1/leaflet-hash.js"></script>
+
+        <!-- gl -->
+        <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@1.15.0/dist/maplibre-gl.css" crossorigin="anonymous">
+        <script src="https://unpkg.com/maplibre-gl@1.15.0/dist/maplibre-gl.js" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.14-rc.1/leaflet-maplibre-gl.js"></script>
+
+        <!-- canvas renderer -->
+        <script src="https://unpkg.com/protomaps@0.12.0/dist/protomaps.min.js"></script>
+    </head>
+    <body>
+        <div id="app" class="flex sans-serif" style="height:400px">
+            <div class="flex flex-column w-50">
+                <div class="flex-grow h-100 flex" id="map-left"></div>
+            </div>
+            <div class="flex flex-column w-50 bg-moon-gray">
+                <div class="flex-grow h-100 flex" id="map-right"></div>
+            </div>
+        </div>
+    </body>
+    <script>
+        const DEMO_KEY = "1003762824b9687f" // only works on gh-pages, get your own at https://protomaps.com
+        const VECTOR_TILES_URL = 'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.pbf?key=' + DEMO_KEY
+
+        const JSON_STYLE = {
+            version: 8,
+            sources: {
+                protomaps: {
+                    type:"vector",
+                    tiles:[VECTOR_TILES_URL],
+                    minzoom:0,
+                    maxzoom:14,
+                    attribution: "<a href=\"https://protomaps.com\" target=\"_blank\">Protomaps</a> © <a href=\"https://www.openstreetmap.org\" target=\"_blank\"> OpenStreetMap</a>"
+                }
+            },
+            layers:[
+                {
+                    id:"roads",
+                    type:"line",
+                    source:"protomaps",
+                    "source-layer":"roads"
+                }
+            ]
+        }
+
+        const PAINT_RULES = [
+            {
+                dataLayer:"roads",
+                symbolizer: new protomaps.LineSymbolizer({color:"black"})
+            }
+        ]
+
+        maplibregl.setRTLTextPlugin("https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.2.3/mapbox-gl-rtl-text.min.js")
+        const mountMap = (map, optType) => {
+            if (optType === 'gl') {
+                L.maplibreGL({
+                    style: JSON_STYLE,
+                    attribution:'<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map)
+            } else if (optType === 'canvas') {
+                (protomaps.leafletLayer({
+                    url:VECTOR_TILES_URL,
+                    paint_rules: PAINT_RULES,
+                    label_rules: [],
+                    attribution:'<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
+                })).addTo(map)
+            } else {
+                throw Error("Not recognized")
+            }
+        }
+
+        var search = new URLSearchParams(window.location.search)
+        var app = new Vue({
+            el: '#app',
+            data: {
+                compare: true
+            },
+            mounted: function () {
+                let mapLeft = L.map('map-left',{fadeAnimation:false})
+                if (!window.location.hash) mapLeft.setView([51.505, -0.09], 13)
+                let hsh = new L.Hash(mapLeft)
+                hsh.update() // force immediately as we need to read the center
+                mountMap(mapLeft,'canvas')
+                let mapRight = L.map('map-right',{
+                    doubleClickZoom: false,
+                    touchZoom: false,
+                    scrollWheelZoom: false,
+                    zoomControl:false
+                })
+                mapRight.dragging.disable()
+                mapLeft.sync(mapRight)
+                mountMap(mapRight,'gl')
+            }, updated: function() {
+                window.location.search = params.toString()
+            }
+        })
+    </script>
+</html>
