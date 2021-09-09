@@ -4,7 +4,7 @@
    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
    crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-   <!-- <script src="Leaflet.SmoothwheelZoom.js"></script> -->
+   <script src="./Leaflet.SmoothwheelZoom.js"></script>
    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
@@ -17,7 +17,7 @@
         }
 
         .leaflet-zoom-anim .leaflet-zoom-animated {
-            transition: transform 0.25s cubic-bezier(0,0,0.25,1);
+            transition: transform 0.0s cubic-bezier(0,0,0.25,1);
         }
     </style>
 <body>
@@ -38,7 +38,7 @@
             }
         })
 
-        var map = L.map('map',{zoomAnimation:true,zoomSnap:true}).setView([0,0], 0)
+        var map = L.map('map',{scrollWheelZoom: false,smoothWheelZoom: true,smoothSensitivity: 1}).setView([0,0], 0)
         window.map = map
         let pane = L.DomUtil.create('canvas', 'leaflet-base-container', map._container);
         (new CanvasLayer()).addTo(map)
@@ -53,42 +53,12 @@
         var ismousedown = false;
         var startDrag = undefined;
 
-        map.on("zoomanim", animEvent => {
-            var start = undefined // performance.now()
-            var startZoom = map.getZoom()
-            var endZoom = animEvent.zoom
-            let startLat = map.getCenter().lat
-            let startLng = map.getCenter().lng
-            let endLat = animEvent.center.lat
-            let endLng = animEvent.center.lng
-
-            let animDuration = 250
-            let bez = new UnitBezier(0,0,0.25,1)
-            let animate = ts => {
-                if (start === undefined) {
-                    start = ts
-                }
-                let elapsed = ts - start
-                if (elapsed < animDuration) {
-                    let t = bez.solve(elapsed/animDuration)
-                    w.zoom = startZoom + t*(endZoom-startZoom)
-                    w.lat = startLat + t *(endLat-startLat)
-                    w.lng = startLng + t *(endLng-startLng)
-                    w.draw(stats.begin,stats.end)
-                    requestAnimationFrame(animate)
-                }
-            }
-
-            requestAnimationFrame(animate)
-        })
-
         map.on("move", e => {
             let center = map.getCenter()
             w.lat = center.lat
             w.lng = center.lng
             w.zoom = map.getZoom()
             w.draw(stats.begin,stats.end)
-
         })
 
         map.on("resize", e => {
