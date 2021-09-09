@@ -171,11 +171,11 @@ class World {
         let sz = 256*factor
         this.context.save()
         this.context.translate(-tx+cx,ty+cy)
-        this.context.fillStyle = "red"
+        this.context.fillStyle = "seagreen"
         this.context.fillRect(-sz/2,-sz/2,sz,sz)
-        this.context.fillStyle = this.pattern
-        this.context.scale(factor,factor)
-        this.context.fillRect(-sz/2/factor,-sz/2/factor,sz/factor,sz/factor)
+        // this.context.fillStyle = this.pattern
+        // this.context.scale(factor,factor)
+        // this.context.fillRect(-sz/2/factor,-sz/2/factor,sz/factor,sz/factor)
         this.context.restore()
 
         // this.context.translate(this.dx,this.dy)
