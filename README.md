@@ -2,7 +2,7 @@ Criteria for basemap on rendering for the web. The more you can achieve, the bet
 
 1. 60fps smoothness
 
-The map should animate smoothly.
+The map should animate smoothly at resolutions up to 4k (3840x2160)
 
 2. 0ms responsiveness
 
@@ -26,7 +26,7 @@ The map should support a continuum of zoom levels.
 
 7. hackability
 
-Most parts of the map system should be modifiable at runtime via JavaScript. 
+Most parts of the map system should be modifiable at runtime via JavaScript and seamlessly integrate with tools like leaflet and openlayers
 
 8. i18n
 
