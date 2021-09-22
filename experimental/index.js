@@ -112,7 +112,8 @@ class World {
         tile.height = 1024 * dpr
         let tileCtx = tile.getContext('2d')
         tileCtx.scale(dpr,dpr)
-        tileCtx.fillStyle = "steelblue"
+        tileCtx.fillStyle = "seagreen"
+        tileCtx.globalAlpha = 0.5
         tileCtx.fillRect(0,0,1024,1024)
         this.tile = tile
 
@@ -130,14 +131,18 @@ class World {
         this.label = label
 
         this.positions = []
-        for (var x = 0; x < 20; x++) {
-            for (var y = 0; y < 20; y++) {
+        for (var x = 0; x < 10; x++) {
+            for (var y = 0; y < 10; y++) {
                 this.positions.push([x*40,y*40])
-
             }
         }
 
         this.needsUpdate = true
+        this.renderedTiles = [
+            {coords:{z:0,x:0,y:0},canvas:undefined},
+            {coords:{z:1,x:1,y:1},canvas:undefined},
+            {coords:{z:2,x:2,y:3},canvas:undefined}
+        ]
     } 
 
     project = (in_lat,in_lng) => {
@@ -157,6 +162,7 @@ class World {
     }
 
     draw(begin,end) {
+        // console.log(this.zoom)
         // at zoom 0, the 6378137*2 diameter is 256 pixels
         this.context.clearRect(0,0,this.canvas.width,this.canvas.height)
         let dpr = window.devicePixelRatio
@@ -168,26 +174,39 @@ class World {
         let tx = projected[0] / Math.PI / 2 * 256 * factor
         let ty = projected[1] / Math.PI / 2 * 256 * factor
 
-        let sz = 256*factor
+        let currentLevel = Math.floor(this.zoom)
         this.context.save()
-        this.context.translate(-tx+cx,ty+cy)
-        this.context.fillStyle = "seagreen"
-        this.context.fillRect(-sz/2,-sz/2,sz,sz)
+        this.context.translate(-tx+cx,ty+cy) // translate to center
+
+        this.context.globalAlpha = 0.5
+        // this.context.fillStyle = "seagreen"
+        // this.context.fillRect(-sz/2,-sz/2,sz,sz)
+        // this.context.fillStyle = "black"
+        // this.context.fillText("0,0,0",20,20)
         // this.context.fillStyle = this.pattern
         // this.context.scale(factor,factor)
         // this.context.fillRect(-sz/2/factor,-sz/2/factor,sz/factor,sz/factor)
+
+        // given the current center, zoom, width, height:
+        // where the center is 0,0 in the canvas
+        // calculate the x,y and scale to draw the tile at.
+        // does not need to modify the current transformation matrix
+        let sz = 256*factor
+        for (let tile of this.renderedTiles) {
+            let z = tile.coords.z
+            let pz = (1 << z)
+            this.context.drawImage(this.tile,-sz/2+sz/pz*tile.coords.x,-sz/2+sz/pz*tile.coords.y,sz/pz,sz/pz)
+        }
+
+        // enqueue any newly visible tiles
+        // remove any tiles outside of the buffered viewport
         this.context.restore()
-
-        // this.context.translate(this.dx,this.dy)
-        // // draw all tiles
-        // this.context.drawImage(this.tile,0,0,1024* this.zoom,1024 * this.zoom)
-
-        // for (var position of this.positions) {
-        //     this.context.drawImage(this.label,position[0] * this.zoom,position[1] * this.zoom)
-        //     // console.log(position)
-        // }
-        end()
+        // has an internal list of tiles
 
         // draw all labels
+        // for (var position of this.positions) {
+        //     this.context.drawImage(this.label,position[0] * this.zoom,position[1] * this.zoom)
+        // }
+        // end()
     }
 }

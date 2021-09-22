@@ -38,7 +38,7 @@
             }
         })
 
-        var map = L.map('map',{zoomAnimation:true,zoomSnap:true}).setView([0,0], 0)
+        var map = L.map('map',{zoomAnimation:false,zoomSnap:false}).setView([0,0], 0)
         window.map = map
         let pane = L.DomUtil.create('canvas', 'leaflet-base-container', map._container);
         (new CanvasLayer()).addTo(map)
@@ -88,6 +88,7 @@
             w.lng = center.lng
             w.zoom = map.getZoom()
             w.draw(stats.begin,stats.end)
+            // console.log(map.getZoom())
 
         })
 
