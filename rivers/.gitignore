@@ -1,0 +1,4 @@
+ne_10m_rivers_north_america/
+ne_10m_rivers_lake_centerlines/
+*.mbtiles
+*.geojson
