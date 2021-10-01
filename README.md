@@ -9,3 +9,4 @@
 
 [census blocks - no limit](./census/nolimit.html)
 [census blocks - coalesced](./census/coalesced.html)
+[census blocks - maplibre gl](./census/gl.html)
