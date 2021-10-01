@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/protomaps@1.12.0/dist/protomaps.min.js"></script>
+        <script src="https://unpkg.com/color2k@1.2.4/dist/index.umd.js"></script>
+        <title>rivers</title>
+        <style>
+            body, #map {
+                height:100vh;
+                margin:0px;
+                background-color: #222;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div> 
+        <script>
+            class SpinHueSymbolizer {
+                draw(ctx,geom,z,f) {
+                    ctx.lineWidth = 2
+                    for (let ls of geom) {
+                        for (var i = 0; i < ls.length-1; i++) {
+                            let p1 = ls[i]
+                            let p2 = ls[i+1]
+                            var angle = Math.atan2(p2.y-p1.y,p2.x-p1.x)*180/Math.PI
+                            ctx.strokeStyle = color2K.hsla(angle,1,0.5,1)
+                            ctx.beginPath()
+                            ctx.moveTo(p1.x,p1.y)
+                            ctx.lineTo(p2.x,p2.y)
+                            ctx.stroke()
+                        }
+                    }
+                }
+            }
+
+            const map = L.map('map')
+            let paint_rules = [
+                {
+                    dataLayer:"rivers",
+                    symbolizer: new SpinHueSymbolizer()
+                }
+            ]
+            map.setView(new L.LatLng(44.34,-101.43),3)
+            var layer = protomaps.leafletLayer({
+                url:'ne_10m_rivers.pmtiles',
+                paint_rules:paint_rules,
+                maxDataZoom:4,
+                levelDiff:1
+            })
+            layer.addTo(map)
+            layer.addInspector(map)
+        </script>
+    </body>
+</html>
