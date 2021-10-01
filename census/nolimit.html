@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-hash@0.2.1/leaflet-hash.js"></script>
+        <script src="../shared/Leaflet.SmoothWheelZoom.js"></script>
+        <script src="https://unpkg.com/protomaps@1.13.0/dist/protomaps.min.js"></script>
+        <title>zcta - nolimit</title>
+        <style>
+            body, #map {
+                height:100vh;
+                margin:0px;
+                background-color: #222;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div> 
+        <script>
+            const map = L.map('map',{scrollWheelZoom: false,smoothWheelZoom: true,smoothSensitivity: 1})
+            let hash = new L.Hash(map)
+            let paint_rules = [
+                {
+                    dataLayer:"zcta",
+                    symbolizer: new protomaps.PolygonSymbolizer({
+                        fill:"white",
+                        width:(z) => { return Math.pow(1.05,z) },
+                        stroke:"steelblue"
+                    })
+                },
+            ]
+            if (!window.location.hash) map.setView(new L.LatLng(44.34,-101.43),3)
+            var layer = protomaps.leafletLayer({
+                url:'https://protomaps-static.sfo3.digitaloceanspaces.com/cb_2018_us_zcta510_500k_nolimit.pmtiles',
+                paint_rules:paint_rules,
+                maxDataZoom:7,
+                levelDiff:2,
+                debug:"#aaa"
+            })
+            layer.addTo(map)
+            layer.addInspector(map)
+        </script>
+    </body>
+</html>
