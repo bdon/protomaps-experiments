@@ -8,4 +8,4 @@
 [rivers colored by angle](./rivers)
 
 [census blocks - no limit](./census/nolimit.html)
-[census blocks - coalesced](./experimental/smoothwheelzoom.html)
+[census blocks - coalesced](./experimental/coalesced.html)
