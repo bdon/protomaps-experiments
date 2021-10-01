@@ -19,9 +19,17 @@
         .leaflet-zoom-anim .leaflet-zoom-animated {
             transition: transform 0.25s cubic-bezier(0,0,0.25,1);
         }
+
+        #zoomDisplay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 1rem;
+        }
     </style>
 <body>
     <div id="map"></div>
+    <div id="zoomDisplay">zoom</div>
     <script src="index.js"></script>
     <script>
         var CanvasLayer = L.GridLayer.extend({
@@ -38,7 +46,7 @@
             }
         })
 
-        var map = L.map('map',{zoomAnimation:false,zoomSnap:false}).setView([0,0], 0)
+        var map = L.map('map',{zoomAnimation:false,zoomSnap:false,wheelPxPerZoomLevel:240}).setView([0,0], 0)
         window.map = map
         let pane = L.DomUtil.create('canvas', 'leaflet-base-container', map._container);
         (new CanvasLayer()).addTo(map)
@@ -88,6 +96,7 @@
             w.lng = center.lng
             w.zoom = map.getZoom()
             w.draw(stats.begin,stats.end)
+            document.getElementById("zoomDisplay").innerHTML = map.getZoom()
             // console.log(map.getZoom())
 
         })
