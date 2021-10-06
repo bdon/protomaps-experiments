@@ -1,0 +1,126 @@
+<html>
+    <script src="https://unpkg.com/stats.js@0.17.0/build/stats.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+   <script src="../shared/Leaflet.SmoothWheelZoom.js"></script>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            color:  royalblue;
+            text-rendering:  geometricPrecision;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            background-color:  #222;
+        }
+
+        #markerdiv {
+            border:  1px solid royalblue;
+            overflow-x: visible;
+            white-space: nowrap;
+            font-size: 1px;
+        }
+
+        svg text {
+            fill:  royalblue;
+        }
+        svg {
+            border: 1px solid royalbue;
+        }
+
+        .leaflet-div-icon {
+            background: none;
+        }
+    </style>
+<body>
+    <div id="map"></div>
+    <script>
+        let DPR = window.devicePixelRatio
+        
+        var CanvasLayer = L.GridLayer.extend({
+            createTile: function(coords){
+                var tile = L.DomUtil.create('canvas', 'leaflet-tile')
+                var size = this.getTileSize()
+                tile.width = size.x * DPR
+                tile.height = size.y * DPR
+                var ctx = tile.getContext('2d')
+                ctx.lineWidth = 0.5
+                ctx.strokeStyle = "white"
+                ctx.scale(DPR,DPR)
+                ctx.fillStyle = "#222"
+                ctx.fillRect(0,0,256,256)
+                ctx.strokeRect(0,0,256,256)
+
+                ctx.strokeStyle = "#888"
+                ctx.beginPath()
+                for (var x = 16; x < 256; x += 16) {
+                    ctx.moveTo(x,0)
+                    ctx.lineTo(x,256)
+                }
+                for (var y = 16; y < 256; y += 16) {
+                    ctx.moveTo(0,y)
+                    ctx.lineTo(256,y)
+                }
+                ctx.stroke()
+                ctx.fillStyle = "white"
+                ctx.fillText(coords.z + " " + coords.x + " " + coords.y,5,15)
+                return tile
+            }
+        })
+        var map = L.map('map',{scrollWheelZoom: false,smoothWheelZoom: true,smoothSensitivity: 1}).setView([0,0], 0)
+        window.map = map
+        let pane = L.DomUtil.create('canvas', 'leaflet-base-container', map._container);
+        (new CanvasLayer()).addTo(map)
+
+        var stats = new Stats()
+        stats.showPanel(1)
+        document.body.appendChild(stats.dom)
+
+        map.on("move", e => {
+            let zoom = e.target.getZoom()
+            let powa = Math.pow(2,zoom)
+            // console.log(powa)
+            let factor = Math.pow(2,zoom) * 1
+            let marker1 = document.getElementById("markerdiv")
+            marker1.style.fontSize = factor + "px"
+            let marker2 = document.getElementById("markersvg")
+            marker2.setAttribute("transform","scale(" + powa + "," + powa + ")")
+            console.log(marker2)
+        })
+
+        let TEXT = "In that Empire, the Art of Cartography attained such Perfection that the map of a single Province occupied the entirety of a City, and the map of the Empire, the entirety of a Province. In time, those Unconscionable Maps no longer satisfied, and the Cartographers Guilds struck a Map of the Empire whose size was that of the Empire, and which coincided point for point with it. The following Generations, who were not so fond of the Study of Cartography as their Forebears had been, saw that that vast Map was Useless, and not without some Pitilessness was it, that they delivered it up to the Inclemencies of Sun and Winters. In the Deserts of the West, still today, there are Tattered Ruins of that Map, inhabited by Animals and Beggars; in all the Land there is no other Relic of the Disciplines of Geography."
+
+
+        L.ScalableTextSVG = L.DivIcon.extend({
+            initialize: function(options) {
+                options = L.Util.setOptions(this, options)
+                options.html = '<svg overflow="visible"><g id="markersvg"><text font-size="1px">' + TEXT + '</text></g></svg>'
+            }
+        })
+
+        L.ScalableTextDiv = L.DivIcon.extend({
+            initialize: function(options) {
+                options = L.Util.setOptions(this, options)
+                options.html = '<div id="markerdiv">' + TEXT + '</div>'
+            }
+        })
+
+        L.marker([0,-115],{icon:(new L.ScalableTextDiv({}))}).addTo(map)
+        L.marker([-20,-115],{icon:(new L.ScalableTextSVG({}))}).addTo(map)
+
+        var svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svgElement.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+        svgElement.setAttribute('viewBox', "0 0 200 200");
+        svgElement.setAttribute('overflow', "visible");
+        svgElement.innerHTML = '<rect fill="none" stroke="white" y="30" width="100" height="100"/><text x="10" y="20">' + TEXT + '</text>';
+        var svgElementBounds = [ [ 32, -130 ], [ 13, -100 ] ];
+        L.svgOverlay(svgElement, svgElementBounds).addTo(map);
+
+    </script>
+</body>
+</html>
