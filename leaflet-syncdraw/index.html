@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <title>leaflet draw sync</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@1.15.0/dist/maplibre-gl.css" crossorigin="anonymous">
+        <script src="https://unpkg.com/maplibre-gl@1.15.0/dist/maplibre-gl.js" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/stats.js@0.17.0/build/stats.min.js"></script>
+        <style>
+            #map {
+                height: 100%;
+                width:  100%;
+            }
+        </style>
+        <script src="https://unpkg.com/protomaps-themes-base@latest/dist/index.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="leaflet-maplibre-gl.js"></script>
+        <script src="../shared/Leaflet.SmoothWheelZoom.js"></script>
+        <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/> 
+        </head>
+    <body>
+        <div id="map">
+        </div>
+    </body>
+    <script>
+        const DEMO_KEY = "1003762824b9687f" // only works on gh-pages, get your own at https://protomaps.com
+        const VECTOR_TILES_URL = 'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.pbf?key=' + DEMO_KEY
+        const json_style = protomaps_themes_base.json_style("light",{
+            glyphs:'https://cdn.protomaps.com/fonts/pbf/{fontstack}/{range}.pbf',
+            tiles:VECTOR_TILES_URL
+        })
+        var map = L.map('map',{scrollWheelZoom: false,smoothWheelZoom: true,smoothSensitivity: 1}).setView([0,0], 3);
+        var gl = L.maplibreGL({
+            style: json_style
+        }).addTo(map);
+         var drawControl = new L.Control.Draw({});
+         var editableLayers = new L.FeatureGroup();
+        map.addLayer(editableLayers);
+        map.addControl(drawControl);
+        map.on(L.Draw.Event.CREATED, function (e) {
+            var type = e.layerType,
+                layer = e.layer;
+            editableLayers.addLayer(layer);
+        });
+    </script>
+</html>
