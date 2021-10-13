@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <script language="javascript">
+            function init() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const count = +urlParams.get('count') || 5000;
+                const canvas = document.createElement("canvas");
+                canvas.style.width = "800px";
+                canvas.style.height = "600px";
+                canvas.width = 1600;
+                canvas.height = 1200;
+                document.body.appendChild(canvas);
+                let first = null;
+                const radius = 2;
+                const paint = (step) => {
+                    first = first ?? step;
+
+                    const diff = (step - first) / 50;
+                    const ctx = canvas.getContext("2d");
+
+                    ctx.clearRect(0, 0, 1600, 1200);
+
+                    for (let k = 0; k < 2; k++) {
+                        ctx.fillStyle = ['rgba(76, 175, 80, 0.5)', 'rgba(176, 175, 80, 0.5)', 'rgba(76, 175, 180, 0.5)'][k];
+                        ctx.beginPath();
+                        for (let j = 0; j < count; j++) {
+                            const x = 1600 - j * 2 * 0.2;
+                            const y = 300 * (k + 1) + 100 * Math.sin((j + diff) * Math.PI / 500);
+                            ctx.moveTo(x + radius, y);
+                            ctx.lineTo(x+radius+10,y+10);
+                        }
+
+                        ctx.stroke();
+
+                        for (let j = 2000; j < 3000; j++) {
+                            const x = 1600 - j * 2 * 0.2;
+                            const y = 300 * (k + 1) + 100 * Math.sin((j + diff) * Math.PI / 500);
+                            const height = Math.random() * 100;
+                            ctx.fillStyle = 'red';
+                            ctx.fillRect(x, x + 0.2, 0.2, height);
+                        }
+                    }
+
+                    requestAnimationFrame(paint);
+                };
+
+                requestAnimationFrame(paint);
+            }
+        </script>
+    </head>
+    <body onload="init()"></body>
+</html>
