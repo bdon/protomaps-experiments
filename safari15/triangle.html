@@ -28,9 +28,10 @@
                             const y = 300 * (k + 1) + 100 * Math.sin((j + diff) * Math.PI / 500);
                             ctx.moveTo(x+radius+10,y+10);
                             ctx.lineTo(x+radius+20,y+10);
+                            ctx.lineTo(x+radius+20,y+20);
                         }
                         ctx.closePath()
-                        ctx.stroke();
+                        ctx.fill();
 
                         for (let j = 2000; j < 3000; j++) {
                             const x = 1600 - j * 2 * 0.2;
