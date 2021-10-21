@@ -39,6 +39,7 @@ class Scroller {
         zoomTarget = zoomDiff < 0 ? Math.floor(zoomTarget) : Math.ceil(zoomTarget);
         zoomTarget = Math.max(this.map.getMinZoom(), Math.min(zoomTarget, this.map.getMaxZoom()));
         this.setCenterZoomTarget(zoomTarget, this._wheelStartLatLng)
+
     }
 
     setCenterZoomTarget(zoom,zoomAround) {
@@ -109,6 +110,8 @@ const leafletHandler = () => {
 
         _wheel: function(event) {
             s.wheel(event);
+            L.DomEvent.preventDefault(event);
+            L.DomEvent.stopPropagation(event);
         }
     })
 }
