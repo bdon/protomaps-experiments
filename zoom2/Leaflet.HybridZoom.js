@@ -27,10 +27,18 @@ class Scroller {
     zoomAroundMouse(zoomDiff,event) {
         let zoom = this.map.getZoom()
         let zoomTarget = zoom + zoomDiff; 
-        let latLngNow = this.map.getCenter()
+        this._wheelMousePosition = this.map.mouseEventToContainerPoint(event);
+        // let latLngNow = this.map.getCenter()
+        this._centerPoint = this.map.getSize()._divideBy(2);
+        // this._startLatLng = this.map.containerPointToLatLng(this._centerPoint);
+        this._startLatLng = this.map.getCenter()
+        this._wheelStartLatLng = this.map.containerPointToLatLng(this._wheelMousePosition);
+
+
+
         zoomTarget = zoomDiff < 0 ? Math.floor(zoomTarget) : Math.ceil(zoomTarget);
         zoomTarget = Math.max(this.map.getMinZoom(), Math.min(zoomTarget, this.map.getMaxZoom()));
-        this.setCenterZoomTarget(zoomTarget, latLngNow)
+        this.setCenterZoomTarget(zoomTarget, this._wheelStartLatLng)
     }
 
     setCenterZoomTarget(zoom,zoomAround) {
@@ -41,11 +49,16 @@ class Scroller {
             this._zoomStart = zoomStep
         } else {
             this._isAnimating = true
+            this._centerStart = this._lastCenter
             this._zoomStart = this._lastZoom
         }
 
         this._animationStart = performance.now()
         this._animationEnd = this._animationStart + 300
+
+
+        // set center target
+        this._centerTarget = zoomAround
         this._zoomTarget = zoom
         this._animFrame = requestAnimationFrame(this.animate)
     }
@@ -74,7 +87,9 @@ class Scroller {
         const percentage = easeOutQuad(progress / length);
         const zoomDiff = (this._zoomTarget - this._zoomStart) * percentage;
         const zoomStep = this._zoomStart + zoomDiff;
-        return { centerStep: {lat:0,lng:0}, zoomStep:zoomStep }
+        var delta = this._wheelMousePosition.subtract(this._centerPoint);
+        let centerStep = this.map.unproject(this.map.project(this._wheelStartLatLng, zoomStep).subtract(delta), zoomStep);
+        return { centerStep: centerStep, zoomStep:zoomStep }
     }
 }
 
