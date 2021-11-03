@@ -19,8 +19,9 @@
    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
    crossorigin=""/>
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/protomaps@latest/dist/protomaps.min.js"></script>
         <script src="leaflet-maplibre-gl.js"></script>
-        <script src="../shared/Leaflet.SmoothWheelZoom.js"></script>
+        <script src="https://unpkg.com/featherzoom@0.0.5/dist/featherzoom.js"></script>
         <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/> 
         </head>
@@ -35,10 +36,16 @@
             glyphs:'https://cdn.protomaps.com/fonts/pbf/{fontstack}/{range}.pbf',
             tiles:VECTOR_TILES_URL
         })
-        var map = L.map('map',{scrollWheelZoom: false,smoothWheelZoom: true,smoothSensitivity: 1}).setView([0,0], 3);
+        json_style.layers = json_style.layers.filter(x => x.type == "symbol")
+        var map = L.map('map',{scrollWheelZoom: false,featherzoom: true}).setView([0,0], 3);
+        var layer = protomaps.leafletLayer({url:'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.pbf?key=1003762824b9687f',label_rules:[]})
+        layer.addTo(map)
+        layer.setZIndex(0)
+        map.addHandler('featherzoom',featherzoom.leafletHandler())
         var gl = L.maplibreGL({
             style: json_style
-        }).addTo(map);
+        })
+        gl.addTo(map);
          var drawControl = new L.Control.Draw({});
          var editableLayers = new L.FeatureGroup();
         map.addLayer(editableLayers);
