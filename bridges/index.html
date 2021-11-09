@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-hash@0.2.1/leaflet-hash.js"></script>
+        <script src="https://unpkg.com/protomaps@1.15.0/dist/protomaps.min.js"></script>
+        <script src="https://unpkg.com/featherzoom@latest/dist/featherzoom.js"></script>
+        <title>bridges </title>
+        <style>
+            body, #map {
+                height:100vh;
+                margin:0px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div> 
+        <script type="module">
+            let scroller = new featherzoom.Scroller();
+            const map = L.map('map',{scrollWheelZoom: false,featherzoom:true})
+            map.addHandler('featherzoom',featherzoom.leafletHandler(scroller))
+            let hash = new L.Hash(map)
+            let paint_rules = [
+                {
+                    dataLayer:"bridges",
+                    symbolizer: new protomaps.CircleSymbolizer({radius:2,fill:"blue",opacity:0.5})
+                }
+            ]
+            if (!window.location.hash) map.setView(new L.LatLng(44.34,-101.43),3)
+
+            var layer = protomaps.leafletLayer({url:'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.pbf?key=1003762824b9687f',shade:"black",tileDelay:1})
+            layer.addTo(map)
+            var overlay = protomaps.leafletLayer({
+                url:'https://protomaps-static.sfo3.digitaloceanspaces.com/bridges.pmtiles',
+                paint_rules:paint_rules,
+                maxDataZoom:6,
+                tileDelay:1
+            })
+            overlay.addTo(map)
+            overlay.addInspector(map)
+        </script>
+    </body>
+</html>
