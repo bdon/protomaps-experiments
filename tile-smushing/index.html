@@ -1,0 +1,74 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-hash@0.2.1/leaflet-hash.js"></script>
+        <script src="./protomaps.min.js"></script>
+        <script src="https://unpkg.com/featherzoom@0.0.5/dist/featherzoom.js"></script>
+        <style>
+            body, #map {
+                height:100vh;
+                margin:0px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div> 
+        <script>
+            let scroller = new featherzoom.Scroller();
+            const map = L.map('map',{scrollWheelZoom:false,featherzoom:true,fadeAnimation:true})
+            map.addHandler('featherzoom',featherzoom.leafletHandler(scroller))
+            let hash = new L.Hash(map)
+            if (!window.location.hash) map.setView(new L.LatLng(41.18,262.97),4)
+            let sources = {
+                "":{
+                    url:'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.pbf?key=1003762824b9687f',
+                    maxdatazoom:14,
+                    levelDiff:2
+                },
+                "fires":{
+                    url:'https://storage.googleapis.com/protomaps-test/FIRESTAT_YRLY.pmtiles',
+                    maxDataZoom:6,
+                    levelDiff:2
+                },
+                "zcta":{
+                    url:'https://storage.googleapis.com/protomaps-test/cb_2018_us_zcta510_500k_coalesced.pmtiles',
+                    maxDataZoom:6,
+                    levelDiff:2
+                }
+            }
+
+            let paint_rules = protomaps.paintRules(protomaps.light).concat([
+                {
+                  dataSource: "zcta",
+                  dataLayer: "zcta",
+                  symbolizer: new protomaps.PolygonSymbolizer({fill:"blue",opacity:0.3,stroke:"blue",width:0.5})
+                },
+                {
+                  dataSource: "fires",
+                  dataLayer: "fires",
+                  symbolizer: new protomaps.CircleSymbolizer({fill:"steelblue",width:3,stroke:"black"})
+                }
+            ])
+            let label_rules = protomaps.labelRules(protomaps.light).concat([
+                {
+                  dataSource: "fires",
+                  dataLayer: "fires",
+                  symbolizer: new protomaps.OffsetTextSymbolizer({
+                    label_props: ["FIRE_NAME"],
+                    fill: "steelblue",
+                    stroke:"black",
+                    width:2
+                  })
+                }
+            ])
+
+            var layer = protomaps.leafletLayer({sources:sources,paint_rules:paint_rules,label_rules:label_rules})
+            layer.addTo(map)
+            layer.addInspector(map)
+            // layer.removeInspector(map)
+        </script>
+    </body>
+</html>
