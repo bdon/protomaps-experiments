@@ -1,10 +1,17 @@
 NAME = "my very cool tileset"
 ATTRIBUTION = "my attribution"
 
+def height_from_tag(z,f):
+  return f.props["height"]
+
 layer(
   name = "buildings",
   tags = [
-    "name"
+    "name", # this is passed straight through as a string value
+    tag(
+      key = "height",
+      value = height_from_tag
+    )
   ],
   filter = lambda z,f:f.props["building"]
 )
@@ -22,8 +29,8 @@ layer(
   tags = [
     "name",
     tag(
-      key = "height",
-      value = 1
+      key = "roadclass",
+      value = "major"
     )
   ],
   filter = roads_filter

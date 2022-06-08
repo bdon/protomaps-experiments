@@ -51,7 +51,7 @@ func (f *Feature) AttrNames() []string {
 type Layer struct {
 	name string
 	filter starlark.Callable
-	tags *starlark.List
+	tagDefinitions *starlark.List
 }
 
 type ComplexTag struct {
@@ -68,7 +68,7 @@ func (t ComplexTag) Hash() (uint32,error) {
 }
 
 func (t ComplexTag) String() string {
-	return t.key
+	return "complextag(key=" + t.key + ")"
 }
 
 func (t ComplexTag) Truth() starlark.Bool {
@@ -86,10 +86,7 @@ func main() {
 
 	layerBuiltin := func(thread *starlark.Thread, b *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 		var layer Layer
-		// var name string
-		// var filter starlark.Callable
-		// var tags *starlark.List
-		if err := starlark.UnpackArgs(b.Name(), args, kwargs, "name", &layer.name, "tags?", &layer.tags, "filter?", &layer.filter); err != nil {
+		if err := starlark.UnpackArgs(b.Name(), args, kwargs, "name", &layer.name, "tags?", &layer.tagDefinitions, "filter?", &layer.filter); err != nil {
 			return nil, err
 		}
 		layers = append(layers,layer)
@@ -143,23 +140,49 @@ func main() {
 
 			for _, layer := range layers {
 				v, err := starlark.Call(thread, layer.filter, starlark.Tuple{starlark.MakeInt(zoom),feature}, nil)
-				if (err != nil) {
+				if err != nil {
 				} else if v.Truth() {
 					fmt.Println("feature", feature.id, "appears in",layer.name,"at zoom", zoom)
+
+					// execute tag definitions
+
+					iter := layer.tagDefinitions.Iterate()
+					defer iter.Done()
+					var tagDefinition starlark.Value
+					for iter.Next(&tagDefinition) {
+						fmt.Println(tagDefinition)
+						// check if it is a string
+						basic_tag, is_string := tagDefinition.(starlark.String)
+						if is_string {
+							fmt.Println("Basic tag", basic_tag)
+						}
+						complex_tag, is_complextag := tagDefinition.(ComplexTag)
+						if is_complextag {
+							fmt.Println("Complex tag", complex_tag)	
+							complex_tag_value := complex_tag.value
+							literal_value, is_literal := complex_tag_value.(starlark.String)
+							if is_literal {
+								fmt.Println(literal_value)
+							}
+							fn_value, is_fn := complex_tag_value.(starlark.Callable)
+							if is_fn {
+								v, _ := starlark.Call(thread, fn_value, starlark.Tuple{starlark.MakeInt(zoom),feature}, nil)
+								if err != nil {
+									fmt.Println(v)
+								}
+							}
+						}
+
+					}
+
 				}
 			}
 
-			// iter := layers_list.Iterate()
-			// defer iter.Done()
-			// var layer starlark.Value
 
-			// // for every layer defined...
-			// for iter.Next(&layer) {
 			// 	layer_dict, _ := layer.(*starlark.Dict)
 			// 	name_val, _, _ := layer_dict.Get(starlark.String("name"))
 			// 	filter_val, _, _ := layer_dict.Get(starlark.String("filter"))
 			// 	filter_func, _ := filter_val.(*starlark.Function)
-			// }
 		}
 	}
 }
