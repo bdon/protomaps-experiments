@@ -1,23 +1,13 @@
 NAME = "my very cool tileset"
 ATTRIBUTION = "my attribution"
 
-LAYERS = []
-
-# layer definition for buildings
-LAYERS.append({
-  "name":"buildings",
-  "tags":[
-    {
-      "key":"height",
-      "value":1
-    },
-    {
-      "key":"name",
-      "value":lambda z,f:f["name"]
-    }
+layer(
+  name = "buildings",
+  tags = [
+    "name"
   ],
-  "filter":lambda z,f:f["properties"]["building"]
-})
+  filter = lambda z,f:f["properties"]["building"]
+)
 
 # layer definition for roads
 # it might have some associated functions (must have unique names)
@@ -27,18 +17,14 @@ def roads_filter(z,f):
   else:
     return f["properties"]["highway"]
 
-LAYERS.append({
-  "name":"roads",
-  "tags":[
-    {
-      "key":"height",
-      "value":1
-    },
-    {
-      "key":"name",
-      "value":lambda z,f:f["name"]
-    }
+layer(
+  name = "roads",
+  tags = [
+    "name",
+    tag(
+      key = "height",
+      value = 1
+    )
   ],
-  "filter":roads_filter
-})
-
+  filter = roads_filter
+)
