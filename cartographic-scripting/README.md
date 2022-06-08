@@ -1,11 +1,23 @@
-
-
 ## Cartographic Scripting
 
 There are two kinds of scripting:
 
 * OpenStreetMap Data > tagged vector features in tiles - "tileset scripting". Requires detailed cleanup on messy OSM data, and filtering to cut down on tile size.
 * tagged vector feature in tiles > visual shapes and labels - "client scripting". Requires expressiveness for flexible display.
+
+## Prototype
+
+This folder has an [example of a tileset](./tileset_definition.star) scripting design written in the [Starlark](https://github.com/bazelbuild/starlark) language, a subset of Python. 
+
+The program [main.go](./main.go) will execute `tileset_definition.star` against dummy data. Control which features are assigned to which layers by defining functions in the file:
+
+```py
+def roads_filter(z,f):
+  if z < 2:
+    return f["properties"]["highway"] == "motorway"
+  else:
+    return f["properties"]["highway"]
+```
 
 ### Mapbox GL Expressions
 
