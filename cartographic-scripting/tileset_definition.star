@@ -6,16 +6,16 @@ layer(
   tags = [
     "name"
   ],
-  filter = lambda z,f:f["properties"]["building"]
+  filter = lambda z,f:f.props["building"]
 )
 
 # layer definition for roads
 # it might have some associated functions (must have unique names)
 def roads_filter(z,f):
   if z < 2:
-    return f["properties"]["highway"] == "motorway"
+    return f.props["highway"] == "motorway"
   else:
-    return f["properties"]["highway"]
+    return f.props["highway"]
 
 layer(
   name = "roads",
