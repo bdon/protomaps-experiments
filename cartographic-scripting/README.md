@@ -19,6 +19,8 @@ def roads_filter(z,f):
     return f["properties"]["highway"]
 ```
 
+## Other Designs
+
 ### Mapbox GL Expressions
 
 [osm-bright-gl-style](https://github.com/openmaptiles/osm-bright-gl-style/blob/master/style.json)
