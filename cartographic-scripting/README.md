@@ -27,6 +27,10 @@ def roads_filter(z,f):
 
 Client scripting. Functional Lisp-inside-JSON. Must run on a unique environment (GL), not turing-complete; limited to built-in functions, can require preprocessor.
 
+#### Preprocessors
+* [Charites](https://github.com/unvt/charites)
+* [glug](https://github.com/unvt/charites)
+
 ### Tangram Styles
 
 [refill-style.yaml](https://github.com/tangrams/refill-style/blob/gh-pages/refill-style.yaml)
