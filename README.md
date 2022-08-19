@@ -1,5 +1,7 @@
 # protomaps-experiments
 
+[cartographic scripting](./cartographic-scripting)
+
 [complex filters](./complex-filters)
 
 [experimental canvas overlay](./experimental)
